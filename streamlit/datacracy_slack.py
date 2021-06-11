@@ -91,12 +91,12 @@ def load_msg_dict():
         except:
             print('====> '+ str(response_json))
     msg_df = pd.DataFrame(msg_dict)
-    return msg_df
-
-def process_msg_data(msg_df, user_df, channel_df):
     ## Extract 2 reply_users
     msg_df['reply_user1'] = msg_df['reply_users'].apply(lambda x: x[0] if x != 0 else '')
     msg_df['reply_user2'] = msg_df['reply_users'].apply(lambda x: x[1] if x != 0 and len(x) > 1 else '')
+    return msg_df
+
+def process_msg_data(msg_df, user_df, channel_df):
     ## Merge to have a nice name displayed
     msg_df = msg_df.merge(user_df[['user_id','name','DataCracy_role']].rename(columns={'name':'submit_name'}), \
         how='left',on='user_id')
@@ -108,7 +108,7 @@ def process_msg_data(msg_df, user_df, channel_df):
     msg_df = msg_df.merge(channel_df[['channel_id','channel_name','created_at']], how='left',on='channel_id')
     ## Format datetime cols
     msg_df['created_at'] = msg_df['created_at'].dt.strftime('%Y-%m-%d')
-    msg_df['msg_date'] = msg_df['msg_ts'].dt.strftime('%Y-%m-%d')
+    msg_df['msg_date'] = msg_df['msg_ts'].dt.strftime('%dd-%d-%m')
     msg_df['msg_time'] = msg_df['msg_ts'].dt.strftime('%H:%M')
     msg_df['wordcount'] = msg_df.text.apply(lambda s: len(s.split()))
     return msg_df
